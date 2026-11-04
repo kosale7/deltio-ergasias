@@ -93,6 +93,14 @@
             background: #fafafa;
             text-align: center;
         }
+        .stamp-box {
+            margin-top: 20px;
+            border: 1px dashed #999;
+            padding: 15px;
+            border-radius: 6px;
+            background: #fafafa;
+            text-align: center;
+        }
         canvas {
             border: 1px solid #ccc;
             background: #fff;
@@ -131,7 +139,7 @@
         @media print {
             body { background: white; margin: 0; }
             .container { box-shadow: none; padding: 0; max-width: 100%; }
-            .auto-fill-box, .btn-clear, .btn-print, .file-input-container { display: none !important; }
+            .auto-fill-box, .btn-clear, .btn-print, input[type="file"] { display: none !important; }
             input, select, textarea { border: 1px solid #666 !important; background: transparent !important; }
             canvas { border: none !important; }
         }
@@ -230,6 +238,13 @@
             </div>
         </div>
 
+        <!-- Πλαίσιο Σφραγίδας -->
+        <div class="stamp-box">
+            <label>Χώρος Σφραγίδας</label>
+            <input type="file" id="stampInput" accept="image/*" onchange="previewStamp(event)" style="margin-top: 8px;">
+            <div id="stampPreviewContainer" style="margin-top: 10px;"></div>
+        </div>
+
         <div class="signature-section">
             <div class="sig-box" id="clientCanvasContainer">
                 <button type="button" class="btn-clear" onclick="clearCanvas('clientCanvas')">Καθαρισμός</button>
@@ -280,13 +295,27 @@
         }
     }
 
+    // Προεπισκόπηση Σφραγίδας
+    function previewStamp(event) {
+        const file = event.target.files[0];
+        const container = document.getElementById('stampPreviewContainer');
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                container.innerHTML = `<img src="${e.target.result}" style="max-height: 100px; max-width: 100%; object-fit: contain;" alt="Σφραγίδα">`;
+            }
+            reader.readAsDataURL(file);
+        } else {
+            container.innerHTML = '';
+        }
+    }
+
     // 2. Setup Canvas Υπογραφών (με υποστήριξη Αφής / Touch)
     function setupCanvas(canvasId) {
         const canvas = document.getElementById(canvasId);
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         
-        // Διόρθωση ανάλυσης Canvas
         canvas.width = canvas.offsetWidth;
         canvas.height = canvas.offsetHeight;
 
@@ -346,8 +375,6 @@
     window.onload = function() {
         setupCanvas('clientCanvas');
         setupCanvas('techCanvas');
-        
-        // Προκαθορισμένη ημερομηνία σημερινή
         document.getElementById('date').valueAsDate = new Date();
     };
 
