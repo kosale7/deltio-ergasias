@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Δελτίο Εργασίας - Promed Hellas</title>
+    <style>
+* { box-sizing: border-box; }
+body { font-family: Arial, Helvetica, sans-serif; background-color: #f4f4f4; padding: 10px; color: #000; font-size: 14px; margin: 0; }
+.container { max-width: 900px; background: #fff; padding: 20px; margin: auto; border: 1px solid #ccc; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 100%; }
+        body { font-family: Arial, Helvetica, sans-serif; background-color: #f4f4f4; padding: 20px; color: #000; font-size: 15px; }
+        .container { max-width: 900px; background: #fff; padding: 35px; margin: auto; border: 1px solid #ccc; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        
+        /* Επικεφαλίδα με την εικόνα logo.jpg */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid #ddd; padding-bottom: 15px; }
+        .logo-img { height: 150px; width: auto; object-fit: contain; }
+
+        .title-bar { text-align: center; margin-bottom: 25px; }
+        .title-bar h2 { margin: 0; color: #000; font-size: 24px; font-weight: bold; letter-spacing: 1px; }
+
+        .form-row { display: flex; justify-content: space-between; margin-bottom: 15px; gap: 12px; flex-wrap: wrap; }
+        .form-group { flex: 1; min-width: 200px; }
+        
+        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px; color: #111; }
+        input, select, textarea { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #999; border-radius: 4px; font-size: 16px; background-color: #fff; -webkit-appearance: none; 
+ }
+        input:focus, select:focus, textarea:focus { border-color: #0087a2; outline: none; box-shadow: 0 0 4px rgba(0,135,162,0.3); }
+        textarea { resize: vertical; height: 110px; }
+        
+        /* Στυλ για τις υπογραφές και το Signature Pad / Σφραγίδα */
+        .signatures { display: flex; justify-content: space-between; margin-top: 35px; gap: 20px; flex-wrap: wrap; }
+        .signature-box { width: 45%; min-width: 280px; flex: 1; text-align: center; font-weight: bold; font-size: 14px; position: relative; }
+        
+        .sig-canvas-container { border: 1.5px dashed #0087a2; background: #fafafa; border-radius: 4px; position: relative; margin-bottom: 5px; }
+        canvas { width: 100%; height: 120px; display: block; touch-action: none; -webkit-user-select: none; }
+        
+        /* Στυλ για τη σφραγίδα */
+        .stamp-container { margin-top: 10px; text-align: center; }
+        .stamp-preview-box { border: 1px dashed #666; background: #f9f9f9; min-height: 80px; max-height: 120px; display: flex; align-items: center; justify-content: center; border-radius: 4px; overflow: hidden; margin-bottom: 5px; position: relative; }
+        .stamp-preview-box img { max-height: 110px; max-width: 100%; object-fit: contain; }
+        .stamp-placeholder { color: #888; font-size: 12px; font-weight: normal; }
+
+        .btn-clear { background: #e0e0e0; border: none; padding: 4px 10px; font-size: 11px; cursor: pointer; border-radius: 3px; font-weight: bold; color: #333; float: right; margin-bottom: 5px; }
+        .btn-clear:hover { background: #d0d0d0; }
+
+        .btn-print { display: block; width: 100%; background: #0087a2; color: white; border: none; padding: 14px; font-size: 18px; cursor: pointer; border-radius: 5px; margin-top: 30px; font-weight: bold; }
+        .btn-print:hover { background: #006b81; }
+        
+        @media print {
+            .btn-print { display: none !important; }
+            .no-print { display: none !important; }
+            .btn-clear { display: none !important; }
+            .sig-canvas-container { border: none; border-top: 1.5px solid #000; background: transparent; }
+            .stamp-preview-box { border: none; background: transparent; }
+            body { background: white; padding: 0; font-size: 14px; }
+            .container { border: none; box-shadow: none; padding: 0; max-width: 100%; }
+            input, select, textarea { border: 1px solid #666; padding: 6px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Επικεφαλίδα με την εικόνα logo.jpgAAA -->
+    <div class="header">
+        <img src="https://lh3.googleusercontent.com/d/1v8OhY0FGFLElFrP1b_FYhpIA_a8ql4FT" alt="PROMED Hellas" class="logo-img">
+    </div>
+
+    <!-- Τίτλος -->
+    <div class="title-bar">
+        <h2>ΔΕΛΤΙΟ ΕΡΓΑΣΙΑΣ</h2>
+    </div>
+    
+    <form>
+        <!-- ΜΠΑΡΑ ΓΡΗΓΟΡΗΣ ΕΠΙΛΟΓΗΣ ΠΕΛΑΤΗ (Δεν εκτυπώνεται) -->
+        <div class="form-row no-print" style="background: #eef7f9; padding: 12px; border-radius: 5px; border: 1px dashed #0087a2; margin-bottom: 20px;">
+            <div class="form-group">
+                <label for="clientSelect">⚡ Γρήγορη Επιλογή Αποθηκευμένου Πελάτη:</label>
+                <select id="clientSelect" name="clientSelect" onchange="fillClientDetails()">
+                    <option value="">-- Επιλέξτε πελάτη για αυτόματη συμπλήρωση --</option>
+                    <option value="c1" 
+                        data-name="Βιοιατρικἠ Γλυφάδας" 
+                        data-address="Λ.Βουλιαγμένης 187" 
+                        data-city="Γλυφάδα" 
+                        data-phone="" 
+                        data-afm="" 
+                        data-doy=""
+                        data-system="Achieva dStream"
+                        data-serial="10040"
+                        data-house="Philips">Βιοιατρικἠ Γλυφάδας</option>
+                    
+                    <option value="c2" 
+                        data-name="Βιοκλινική Αθηνών" 
+                        data-address="Μαρίνου Γερουλάνου 15" 
+                        data-city="Αθήνα" 
+                        data-phone="" 
+                        data-afm="" 
+                        data-doy=""
+                        data-system="Achieva dStream"
+                        data-serial="18696"
+                        data-house="Philips">Βιοκλινική Αθηνών</option>
+                    
+                    <option value="c3" 
+                        data-name="Euromedica Κηφισίας" 
+                        data-address="Λ.Κηφισίας 243" 
+                        data-city="Κηφισιά" 
+                        data-phone="" 
+                        data-afm="" 
+                        data-doy=""
+                        data-system="Panorama"
+                        data-serial="37160"
+                        data-house="Philips">Euromedica Κηφισίας</option>
+<option value="c4" 
+                        data-name="BIOSCAN" 
+                        data-address="Υγουμἐνου Γαβριἠλ κ Ηλιἀκη" 
+                        data-city="Ρἐθυμνο" 
+                        data-phone="" 
+                        data-afm="" 
+                        data-doy=""
+                        data-system="Panorama"
+                        data-serial="37192"
+                        data-house="Philips">BIOSCAN</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group" style="flex: 3;">
+                <label for="client">Πελάτης:</label>
+                <input type="text" id="client" name="client">
+            </div>
+            <div class="form-group" style="flex: 1;">
+                <label for="docNumber">Ν° Δελτίου:</label>
+                <input type="text" id="docNumber" name="docNumber">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group" style="flex: 2;">
+                <label for="address">Διεύθυνση:</label>
+                <input type="text" id="address" name="address">
+            </div>
+            <div class="form-group" style="flex: 1;">
+                <label for="city">Πόλη:</label>
+                <input type="text" id="city" name="city">
+            </div>
+            <div class="form-group" style="flex: 1;">
+                <label for="phone">Τηλέφωνο:</label>
+                <input type="text" id="phone" name="phone">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="afm">Α.Φ.Μ.:</label>
+                <input type="text" id="afm" name="afm">
+            </div>
+            <div class="form-group">
+                <label for="doy">Δ.Ο.Υ.:</label>
+                <input type="text" id="doy" name="doy">
+            </div>
+            <div class="form-group">
+                <label for="date">Ημερομηνία:</label>
+                <input type="date" id="date" name="date">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="system">Σύστημα:</label>
+                <input type="text" id="system" name="system">
+            </div>
+            <div class="form-group">
+                <label for="serial">Serial No:</label>
+                <input type="text" id="serial" name="serial">
+            </div>
+            <div class="form-group">
+                <label for="house">Οίκος:</label>
+                <input type="text" id="house" name="house">
+            </div>
+        </div>
+
+        <!-- Ώρες (24ωρη μορφή) -->
+        <div class="form-row">
+            <div class="form-group">
+                <label for="timeStart">Ώρα Έναρξης:</label>
+                <input type="time" id="timeStart" name="timeStart">
+            </div>
+            <div class="form-group">
+                <label for="timeEnd">Ώρα Λήξης:</label>
+                <input type="time" id="timeEnd" name="timeEnd">
+            </div>
+        </div>
+
+        <!-- Αιτία Επίσκεψης σε δική της σειρά -->
+        <div class="form-row">
+            <div class="form-group">
+                <label for="reason">Αιτία Επίσκεψης:</label>
+                <input type="text" id="reason" name="reason">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="description">Περιγραφή Εργασίας:</label>
+                <textarea id="description" name="description"></textarea>
+            </div>
+        </div>
+
+        <!-- Υπογραφές & Σφραγίδα Πελάτη -->
+        <div class="signatures">
+            <!-- ΠΛΕΥΡΑ ΠΕΛΑΤΗ (Υπογραφή & Σφραγίδα) -->
+            <div class="signature-box">
+                <button type="button" class="btn-clear" onclick="clearSignature('clientCanvas')">Καθαρισμός</button>
+                <div style="clear: both;"></div>
+                <div class="sig-canvas-container">
+                    <canvas id="clientCanvas"></canvas>
+                </div>
+                Υπογραφή Πελάτη
+
+                <!-- Περιοχή Σφραγίδας Πελάτη -->
+                <div class="stamp-container">
+                    <div class="stamp-preview-box" id="stampPreviewBox">
+                        <span class="stamp-placeholder">Χώρος Σφραγίδας</span>
+                    </div>
+                    <!-- Κουμπί επιλογής φωτογραφίας σφραγίδας (δεν εκτυπώνεται) -->
+                    <div class="no-print" style="margin-top: 5px;">
+                        <input type="file" id="stampFile" accept="image/*" onchange="loadStamp(event)" style="font-size: 11px; padding: 3px;">
+                        <button type="button" class="btn-clear" style="float: none; margin-top: 3px;" onclick="clearStamp()">Αφαίρεση</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ΠΛΕΥΡΑ ΤΕΧΝΙΚΟΥ -->
+            <div class="signature-box">
+                <button type="button" class="btn-clear" onclick="clearSignature('techCanvas')">Καθαρισμός</button>
+                <div style="clear: both;"></div>
+                <div class="sig-canvas-container">
+                    <canvas id="techCanvas"></canvas>
+                </div>
+                Υπογραφή Τεχνικού
+            </div>
+        </div>
+
+        <button type="button" class="btn-print" onclick="printDirectly()">Εκτύπωση / Αποθήκευση PDF</button>
+    </form>
+</div>
+
+<script>
+    function fillClientDetails() {
+        var select = document.getElementById("clientSelect");
+        var selectedOption = select.options[select.selectedIndex];
+        
+        if (selectedOption.value !== "") {
+            document.getElementById("client").value = selectedOption.getAttribute("data-name") || "";
+            document.getElementById("address").value = selectedOption.getAttribute("data-address") || "";
+            document.getElementById("city").value = selectedOption.getAttribute("data-city") || "";
+            document.getElementById("phone").value = selectedOption.getAttribute("data-phone") || "";
+            document.getElementById("afm").value = selectedOption.getAttribute("data-afm") || "";
+            document.getElementById("doy").value = selectedOption.getAttribute("data-doy") || "";
+            document.getElementById("system").value = selectedOption.getAttribute("data-system") || "";
+            document.getElementById("serial").value = selectedOption.getAttribute("data-serial") || "";
+            document.getElementById("house").value = selectedOption.getAttribute("data-house") || "";
+        } else {
+            document.getElementById("client").value = "";
+            document.getElementById("address").value = "";
+            document.getElementById("city").value = "";
+            document.getElementById("phone").value = "";
+            document.getElementById("afm").value = "";
+            document.getElementById("doy").value = "";
+            document.getElementById("system").value = "";
+            document.getElementById("serial").value = "";
+            document.getElementById("house").value = "";
+        }
+    }
+
+    // --- Φόρτωση Φωτογραφίας Σφραγίδας ---
+    function loadStamp(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const box = document.getElementById('stampPreviewBox');
+                box.innerHTML = '<img src="' + e.target.result + '" alt="Σφραγίδα Πελάτη">';
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function clearStamp() {
+        const box = document.getElementById('stampPreviewBox');
+        box.innerHTML = '<span class="stamp-placeholder">Χώρος Σφραγίδας</span>';
+        document.getElementById('stampFile').value = '';
+    }
+
+    // --- Script για τη λειτουργία υπογραφής σε Canvas (συμβατό με iPhone/Safari) ---
+    function setupCanvas(canvasId) {
+        const canvas = document.getElementById(canvasId);
+        const ctx = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        let painting = false;
+
+        function startPosition(e) {
+            painting = true;
+            draw(e);
+        }
+
+        function endPosition() {
+            painting = false;
+            ctx.beginPath();
+        }
+
+        function draw(e) {
+            if (!painting) return;
+            e.preventDefault();
+            
+            ctx.lineWidth = 2.5;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = '#000';
+
+            const rect = canvas.getBoundingClientRect();
+            let clientX = e.clientX;
+            let clientY = e.clientY;
+
+            if (e.touches && e.touches[0]) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            }
+
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+        }
+
+        canvas.addEventListener('mousedown', startPosition);
+        canvas.addEventListener('mouseup', endPosition);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseleave', endPosition);
+
+        canvas.addEventListener('touchstart', startPosition, { passive: false });
+        canvas.addEventListener('touchend', endPosition);
+        canvas.addEventListener('touchmove', draw, { passive: false });
+    }
+
+    function clearSignature(canvasId) {
+        const canvas = document.getElementById(canvasId);
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // --- Ειδική συνάρτηση Εκτύπωσης/PDF για να παρακάμπτει τους περιορισμούς iframe (Google Sites) ---
+    function printDirectly() {
+        // Μετατροπή των υπογραφών από Canvas σε εικόνες για να μεταφερθούν στο νέο παράθυρο
+        const clientCanvas = document.getElementById('clientCanvas');
+        const techCanvas = document.getElementById('techCanvas');
+        
+        const clientImg = clientCanvas.toDataURL();
+        const techImg = techCanvas.toDataURL();
+
+        // Ενημέρωση των τιμών στα πεδία εισαγωγής ώστε να φαίνονται στο νέο παράθυρο
+        const inputs = document.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            if (input.type !== 'file') {
+                input.setAttribute('value', input.value);
+                if (input.tagName.toLowerCase() === 'textarea') {
+                    input.textContent = input.value;
+                }
+            }
+        });
+
+        // Δημιουργία καθαρού παραθύρου για εκτύπωση
+        const win = window.open('', '_blank');
+        if (!win) {
+            alert("Παρακαλώ επιτρέψτε τα αναδυόμενα παράθυρα (pop-ups) στον browser σας για να εμφανιστεί το PDF.");
+            return;
+        }
+
+        let content = document.documentElement.outerHTML;
+
+        win.document.open();
+        win.document.write(content);
+        win.document.close();
+
+        // Σχεδίαση των υπογραφών στο νέο παράθυρο
+        win.onload = function() {
+            const winClientCanvas = win.document.getElementById('clientCanvas');
+            const winTechCanvas = win.document.getElementById('techCanvas');
+            
+            if (winClientCanvas && winTechCanvas) {
+                const ctxClient = winClientCanvas.getContext('2d');
+                const ctxTech = winTechCanvas.getContext('2d');
+                
+                const img1 = new Image();
+                img1.onload = () => ctxClient.drawImage(img1, 0, 0);
+                img1.src = clientImg;
+
+                const img2 = new Image();
+                img2.onload = () => ctxTech.drawImage(img2, 0, 0);
+                img2.src = techImg;
+            }
+
+            setTimeout(function() {
+                win.focus();
+                win.print();
+            }, 500);
+        };
+    }
+
+    window.onload = function() {
+        setupCanvas('clientCanvas');
+        setupCanvas('techCanvas');
+    };
+</script>
+
+</body>
+</html>
